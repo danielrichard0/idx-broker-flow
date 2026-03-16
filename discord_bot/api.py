@@ -7,7 +7,6 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from routers import alert
 
-
 load_dotenv()
 token = os.getenv('DISCORD_KEY')
 

@@ -3,6 +3,8 @@ from discord_bot.dc_bot import  bot
 import discord
 from dotenv import load_dotenv
 import os
+from datetime import datetime
+from db import get_connection, Transactions
 
 load_dotenv()
 img_url = os.getenv('STOCK_IMG_URL')
@@ -12,6 +14,8 @@ router = APIRouter(
     tags= ["alert"], 
     responses={404: {"description": "Not found"}}
 )
+
+trx = Transactions()
 
 @router.get("/")
 async def rt_alert(code: str,tick_time: str, price: float, shares: int, type: int ):    
@@ -35,10 +39,14 @@ async def rt_alert(code: str,tick_time: str, price: float, shares: int, type: in
                     """
                 )               
 
-                construct_url = img_url+code+'.png'
-                print(construct_url)
-                
-                #embed.set_image(url=construct_url)
-                embed.set_thumbnail(url=construct_url)
-               # await channel.send(f'PRICE ALERT!, [{code}][{tick_time}| HARGA : {price:,} | LOT : {shares/100}] | {status} | TOTAL NILAI : RP. {value:,} ')
+                # save and caching to database
+                trx.trx_cache.append((code, 
+                                      datetime.strptime(tick_time,'%Y-%m-%d %H:%M:%s'), 
+                                      price, shares, type))
+                if len(trx.trx_cache) >= 100:
+                    cursor = get_connection()
+                    trx.save_transaction(cursor)
+
+                construct_url = img_url+code+'.png'                                
+                embed.set_thumbnail(url=construct_url)                    
                 await channel.send(embed=embed)
