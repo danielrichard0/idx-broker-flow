@@ -63,6 +63,10 @@ def get_all_broker_from_idx(driver: webdriver.Chrome):
     df = pd.DataFrame(brokers)
     df.to_csv('daftar_broker_idx.csv')    
 
+
+def get_all_stocks_from_idx(driver: webdriver.Chrome):
+
+
 if __name__ == '__main__':
     driver = _build_driver()
     get_all_broker_from_idx(driver)
