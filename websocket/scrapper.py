@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome import webdriver as w_chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,11 +8,17 @@ from dotenv import load_dotenv
 import os
 import time
 import pandas as pd
+from bs4 import BeautifulSoup
+from datetime import datetime, date
 
 url = "https://stockbit.com/login"
 load_dotenv()
 email = os.getenv('STOCKBIT_EMAIL')
 password = os.getenv('STOCKBIT_PASSWORD')
+broker_url = 'https://www.idx.co.id/id/anggota-bursa-dan-partisipan/profil-anggota-bursa'
+stock_url = 'https://www.idx.co.id/id/perusahaan-tercatat/profil-perusahaan-tercatat/'
+_get_master = False
+
 
 def _build_driver()-> webdriver.Chrome :
     chromedriver_autoinstaller.install()
@@ -36,13 +43,12 @@ def _login(driver: webdriver.Chrome):
     login_button = driver.find_element(By.ID, 'email-login-button')
     login_button.click()
 
-    time.sleep(3)
+    time.sleep(3)  
 
-# get semua broker yang terdaftar di BEI
-def get_all_broker_from_idx(driver: webdriver.Chrome):    
-    idx_url = 'https://www.idx.co.id/id/anggota-bursa-dan-partisipan/profil-anggota-bursa'
 
-    driver.get(idx_url)
+# data saham atau broker bisa diambil lewat sini
+def get_data_from_idx(driver: webdriver.Chrome, url: str, filename: str):
+    driver.get(url)
 
     wait = WebDriverWait(driver, 15)
     btn_selectall = wait.until(
@@ -52,22 +58,20 @@ def get_all_broker_from_idx(driver: webdriver.Chrome):
     select.select_by_value("-1")
 
     table = driver.find_element(By.TAG_NAME, 'tbody')
-    rows = table.find_elements(By.TAG_NAME, 'tr')
+    html = table.get_attribute('outerHTML')
+    soup = BeautifulSoup(html, 'html.parser')
+    datas = [[cell.text.strip() for cell in row.find_all('td')] for row in soup.find_all("tr")]
 
-    brokers = []
-
-    for row in rows:
-        cols = row.find_elements(By.TAG_NAME, 'td')
-        brokers.append([a.text for a in cols ])
-
-    df = pd.DataFrame(brokers)
-    df.to_csv('daftar_broker_idx.csv')    
-
-
-def get_all_stocks_from_idx(driver: webdriver.Chrome):
+    df = pd.DataFrame(datas)
+    df.to_csv(filename)       
 
 
 if __name__ == '__main__':
     driver = _build_driver()
-    get_all_broker_from_idx(driver)
+
+    if _get_master :
+        get_data_from_idx(driver, stock_url, 'daftar_saham_bei_' + str(date.strftime(date.today(),'%d_%m_%Y')) + '.csv')
+        get_data_from_idx(driver, broker_url, 'daftar_broker_terdaftar_' + str(date.strftime(date.today(),'%d_%m_%Y')) + '.csv')
+
+
     #_login(driver)
