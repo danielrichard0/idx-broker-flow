@@ -1,3 +1,4 @@
+<img width="1398" height="908" alt="Screenshot 2026-04-20 231232" src="https://github.com/user-attachments/assets/5da14161-2f89-4e3e-9953-99428bb04504" />
 # Indonesian Stock Broker Activity Dashboard
 
 End-to-end project for collecting Indonesian stock broker activity, storing it in MariaDB, and visualizing broker/stock flow in a Vue heatmap dashboard.
