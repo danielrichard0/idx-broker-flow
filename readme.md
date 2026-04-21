@@ -1,5 +1,33 @@
 <img width="1398" height="908" alt="Screenshot 2026-04-20 231232" src="https://github.com/user-attachments/assets/5da14161-2f89-4e3e-9953-99428bb04504" />
+This project organizes trading data by broker × stock, sorted by brokers with the highest transaction volume within a selected period. For each top broker, the system highlights the top 20 stocks they buy or sell.
+Users can also generate a custom heatmap by selecting specific brokers and stocks. The visualization will indicate whether transactions occurred between the chosen brokers and stocks.
+All data is collected using a custom scraper located in scrapper/scrapper.py, which retrieves:
+- Broker transaction summaries
+- Stock listings
+- Broker lists from BEI/IDX
+
+
 <img width="800" height="450" alt="ezgif-1f1b2afe746d4a60" src="https://github.com/user-attachments/assets/22b05936-baff-41f5-bf65-fb8964ad52b5" />
+The scraper navigates through the broker summary pages of a trading platform, where users can specify:
+
+- The stocks to analyze
+- The time period for the data
+
+For storage, this project uses MariaDB to persist:
+
+- Transaction values
+- Average prices
+- Buy/sell actions
+
+Alternatively, the data can be exported to CSV if a database is not required. However, in this project, a database is necessary to support dynamic data retrieval and visualization through the web application.
+
+The system architecture includes:
+
+- Backend: Built with FastAPI (Python) to serve processed data via APIs
+- Frontend: Built with Vue.js to render interactive heatmaps and user-defined configurations
+  
+*This project does not publish or redistribute data from any specific platform.
+It is intended for personal and academic purposes only and is not for commercial use
 
 # Indonesian Stock Broker Activity Dashboard
 
